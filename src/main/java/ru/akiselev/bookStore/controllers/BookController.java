@@ -9,7 +9,7 @@ import ru.akiselev.bookStore.mapper.BookMapper;
 import ru.akiselev.bookStore.services.BooksService;
 
 @RestController
-@RequestMapping("/bookStore")
+@RequestMapping("/books")
 public class BookController {
 
     private final BooksService booksService;

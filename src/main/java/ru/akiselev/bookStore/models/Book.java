@@ -26,9 +26,10 @@ public class Book {
     @Column(name = "cover")
     private Cover cover;  // Enum типа обложки: твердый или мягкий переплет
 
-    @Column(name = "author")
-    private String author;
-
     @Column(name = "count")
     private Integer count;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id", referencedColumnName = "id")
+    private Author author;
 }

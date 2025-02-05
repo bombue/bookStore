@@ -7,10 +7,9 @@ import ru.akiselev.bookStore.enums.Cover;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookDTO {
-    private Long id;
     private String name;
     private String brand;
     private Cover cover;  // Enum типа обложки: твердый или мягкий переплет
-    private String author;
     private Integer count;
+    private Long author_id;
 }
