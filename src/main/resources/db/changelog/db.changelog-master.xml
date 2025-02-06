@@ -10,4 +10,6 @@
     <include file="create-changeset-book-author-fk.xml" relativeToChangelogFile="true"/>
     <include file="alter-changeset-author-table.xml" relativeToChangelogFile="true"/>
     <include file="insert-changeset-author-table.xml" relativeToChangelogFile="true"/>
+    <include file="create-changeset-user-table.xml" relativeToChangelogFile="true"/>
+    <include file="alter-changeset-user-table.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
