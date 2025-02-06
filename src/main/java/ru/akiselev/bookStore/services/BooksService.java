@@ -1,25 +1,30 @@
 package ru.akiselev.bookStore.services;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.akiselev.bookStore.models.Book;
 import ru.akiselev.bookStore.models.BookFilter;
 import ru.akiselev.bookStore.repositories.BooksRepository;
-import ru.akiselev.bookStore.repositories.CustomBookRepository;
+//import ru.akiselev.bookStore.repositories.CustomBookRepositoryImpl;
 
 import java.util.List;
+
+import static ru.akiselev.bookStore.repositories.BooksRepository.Specs.*;
 
 @Service
 @Transactional(readOnly = true)
 public class BooksService {
     private final BooksRepository booksRepository;
-    private final CustomBookRepository customBookRepository;
 
     @Autowired
-    public BooksService(BooksRepository booksRepository, CustomBookRepository customBookRepository) {
+    public BooksService(BooksRepository booksRepository) {
         this.booksRepository = booksRepository;
-        this.customBookRepository = customBookRepository;
     }
 
     @Transactional
@@ -43,6 +48,10 @@ public class BooksService {
     }
 
     public List<Book> findByFilter(BookFilter filter) {
-        return this.customBookRepository.findByFilter(filter);
+        return this.booksRepository.findAll(byFilter(filter));
+//        return this.booksRepository.findAll(byName(filter.getName())
+//                .and(byBrand(filter.getBrand()))
+//                .and(byCover(filter.getCover()))
+//                .and(byCount(filter.getCount())));
     }
 }
