@@ -2,17 +2,28 @@ package ru.akiselev.bookStore.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.akiselev.bookStore.models.UserInfo;
+import ru.akiselev.bookStore.models.User;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class UserInfoDetails implements UserDetails {
-    private final UserInfo userInfo;
+public class UserDetailsImpl implements UserDetails {
+    private Long id;
+    private String username;
+    private String email;
+    private String password;
+    private Collection<? extends GrantedAuthority> authorities;
+
+    public static UserDetailsImpl build(User user) {
+        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
+        return new UserDetailsImpl(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), authorities);
+    }
 
     // todo тут вроде роли надо вернуть
     @Override
@@ -22,12 +33,12 @@ public class UserInfoDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return userInfo.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return userInfo.getUsername();
+        return username;
     }
 
     @Override

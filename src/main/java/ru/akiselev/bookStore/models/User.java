@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import ru.akiselev.bookStore.enums.Role;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "user")
-public class UserInfo {
+public class User {
 
     @Id
     @Column(name = "id")
@@ -29,9 +30,12 @@ public class UserInfo {
     @Column(name = "email")
     private String email;
 
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createdDate")
     private LocalDateTime createdDate;
 
     @Column(name = "role")
+    @Enumerated(EnumType.STRING)
     private Role role;
 }

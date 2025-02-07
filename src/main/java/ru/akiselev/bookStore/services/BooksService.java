@@ -49,9 +49,5 @@ public class BooksService {
 
     public List<Book> findByFilter(BookFilter filter) {
         return this.booksRepository.findAll(byFilter(filter));
-//        return this.booksRepository.findAll(byName(filter.getName())
-//                .and(byBrand(filter.getBrand()))
-//                .and(byCover(filter.getCover()))
-//                .and(byCount(filter.getCount())));
     }
 }
