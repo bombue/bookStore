@@ -1,34 +1,35 @@
 package ru.akiselev.bookStore.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.akiselev.bookStore.models.Author;
+import ru.akiselev.bookStore.dto.AuthorDTO;
+import ru.akiselev.bookStore.mapper.AuthorMapper;
+import ru.akiselev.bookStore.payload.exceptions.AuthorNotFoundException;
 import ru.akiselev.bookStore.repositories.AuthorsRepository;
 
+import java.util.Optional;
+
+@RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
 public class AuthorsService {
 
     private final AuthorsRepository authorsRepository;
-
-    @Autowired
-    public AuthorsService(AuthorsRepository authorsRepository) {
-        this.authorsRepository = authorsRepository;
-    }
+    private final AuthorMapper authorMapper;
 
     @Transactional
-    public void create(Author author) {
-        this.authorsRepository.save(author);
+    public void create(AuthorDTO authorDTO) {
+        authorsRepository.save(authorMapper.toAuthor(authorDTO));
     }
 
-    public Author read(Long id) {
-        return this.authorsRepository.findById(id).orElse(null);
+    public AuthorDTO read(Long id) {
+        return authorsRepository.findById(id).map(authorMapper::toDto).orElseThrow(AuthorNotFoundException::new);
     }
 
     @Transactional
     public void delete(Long id) {
-        this.authorsRepository.deleteById(id);
+        authorsRepository.deleteById(id);
     }
 
 }

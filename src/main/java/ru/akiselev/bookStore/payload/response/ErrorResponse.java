@@ -7,7 +7,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AuthErrorResponse {
+public class ErrorResponse {
     private String message;
     private long timestamp;
 }

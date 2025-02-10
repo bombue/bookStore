@@ -1,13 +1,12 @@
 package ru.akiselev.bookStore.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.akiselev.bookStore.dto.BookDTO;
 import ru.akiselev.bookStore.enums.Cover;
-import ru.akiselev.bookStore.mapper.BookMapper;
-import ru.akiselev.bookStore.models.Book;
 import ru.akiselev.bookStore.models.BookFilter;
 import ru.akiselev.bookStore.services.BooksService;
 
@@ -15,32 +14,26 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/books")
 public class BookController {
 
     private final BooksService booksService;
-    private final BookMapper bookMapper;
-
-    @Autowired
-    public BookController(BooksService booksService, BookMapper bookMapper) {
-        this.booksService = booksService;
-        this.bookMapper = bookMapper;
-    }
 
     @PostMapping
     public ResponseEntity<HttpStatus> create(@RequestBody BookDTO bookDTO) {
-        booksService.create(bookMapper.toBook(bookDTO));
+        booksService.create(bookDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     private BookDTO read(@PathVariable("id") Long id) {
-        return bookMapper.toDto(booksService.read(id));
+        return booksService.read(id);
     }
 
     @PatchMapping("/{id}")
     private ResponseEntity<HttpStatus> update(@PathVariable("id") Long id, @RequestBody BookDTO bookDTO) {
-        booksService.update(id, bookMapper.toBook(bookDTO));
+        booksService.update(id, bookDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -59,8 +52,7 @@ public class BookController {
                                        @RequestParam(required = false, name = "count") Integer count
                                        ) {
         BookFilter filter = new BookFilter(name, brand, cover, authorFirstName, authorLastName, count);
-        List<Book> bookList = booksService.findByFilter(filter);
-        return bookList.stream().map(bookMapper::toDto).collect(Collectors.toList());
+        return booksService.findByFilter(filter);
     }
 
 }

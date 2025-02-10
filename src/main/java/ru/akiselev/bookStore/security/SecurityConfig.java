@@ -1,5 +1,6 @@
 package ru.akiselev.bookStore.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,19 +19,13 @@ import ru.akiselev.bookStore.security.services.UserDetailsServiceImpl;
 import ru.akiselev.bookStore.security.jwt.AuthEntryPointJwt;
 import ru.akiselev.bookStore.security.jwt.AuthTokenFilter;
 
+@RequiredArgsConstructor
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
-    private UserDetailsServiceImpl userDetailsService;
-    private AuthEntryPointJwt unauthorizedHandler;
-    private AuthTokenFilter authTokenFilter;
-
-    @Autowired
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService, AuthEntryPointJwt unauthorizedHandler, AuthTokenFilter authTokenFilter) {
-        this.userDetailsService = userDetailsService;
-        this.unauthorizedHandler = unauthorizedHandler;
-        this.authTokenFilter = authTokenFilter;
-    }
+    private final UserDetailsServiceImpl userDetailsService;
+    private final AuthEntryPointJwt unauthorizedHandler;
+    private final AuthTokenFilter authTokenFilter;
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {

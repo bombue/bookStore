@@ -12,7 +12,7 @@ import ru.akiselev.bookStore.services.AuthorsService;
 public interface BookMapper {
     @Mapping(source = "author_id", target = "author", qualifiedByName = "authorIdToAuthor")
     Book toBook(BookDTO bookDTO);
-    @Mapping(source = "author", target = "author_id", qualifiedByName = "authorToAuthorId")
+    @Mapping(source = "author.id", target = "author_id")
     BookDTO toDto(Book book);
     @Named("authorIdToAuthor")
     static Author authorIdToAuthor(Long authorId) {
@@ -20,10 +20,13 @@ public interface BookMapper {
         author.setId(authorId);
         return author;
     }
-    @Named("authorToAuthorId")
-    static Long authorToAuthorId(Author author) {
-        if (author != null)
-            return author.getId();
-        else return null;
-    }
+//    @Named("authorToAuthorId")
+//    static Long authorToAuthorId(Author author) {
+//        if (author != null) {
+//            return author.getId();
+//        }
+//        else {
+//            return null;
+//        }
+//    }
 }

@@ -12,7 +12,8 @@ import ru.akiselev.bookStore.enums.Cover;
 @Table(name = "book")
 public class Book {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "book_id_seq", sequenceName = "book_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "book_id_seq")
     @Column(name = "id")
     private Long id;
 

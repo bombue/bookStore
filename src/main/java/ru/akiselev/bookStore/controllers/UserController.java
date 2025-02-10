@@ -1,6 +1,6 @@
 package ru.akiselev.bookStore.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,18 +8,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.akiselev.bookStore.dto.SignInDTO;
 import ru.akiselev.bookStore.dto.SignUpDTO;
 import ru.akiselev.bookStore.email.EmailService;
-import ru.akiselev.bookStore.mapper.UserInfoMapper;
 import ru.akiselev.bookStore.payload.response.JwtResponse;
 import ru.akiselev.bookStore.security.UserDetailsImpl;
-import ru.akiselev.bookStore.security.services.UserDetailsServiceImpl;
 import ru.akiselev.bookStore.security.jwt.JwtUtils;
 import ru.akiselev.bookStore.services.UsersService;
-import ru.akiselev.bookStore.payload.response.AuthErrorResponse;
+import ru.akiselev.bookStore.payload.response.ErrorResponse;
 import ru.akiselev.bookStore.payload.exceptions.EmailAlreadyExistsException;
 import ru.akiselev.bookStore.payload.exceptions.UserAlreadyExistsException;
 import ru.akiselev.bookStore.payload.exceptions.UserNotFoundException;
@@ -28,22 +25,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/auth")
 public class UserController {
-    private final UserInfoMapper userInfoMapper;
+
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
     private final UsersService usersService;
     private final EmailService emailService;
-
-    @Autowired
-    public UserController(UserInfoMapper userInfoMapper, JwtUtils jwtUtils, AuthenticationManager authenticationManager, UsersService usersService, EmailService emailService) {
-        this.userInfoMapper = userInfoMapper;
-        this.jwtUtils = jwtUtils;
-        this.authenticationManager = authenticationManager;
-        this.usersService = usersService;
-        this.emailService = emailService;
-    }
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignUpDTO signUpDTO) {
@@ -54,7 +43,7 @@ public class UserController {
             throw new EmailAlreadyExistsException();
         }
 
-        usersService.create(userInfoMapper.fromSignUpDto(signUpDTO));
+        usersService.create(signUpDTO);
         emailService.sendSimpleEmail(signUpDTO.getEmail(), "registration", "bookStore registration");
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -82,8 +71,8 @@ public class UserController {
     }
 
     @ExceptionHandler
-    private ResponseEntity<AuthErrorResponse> handleException(UserNotFoundException e) {
-        AuthErrorResponse response = new AuthErrorResponse(
+    private ResponseEntity<ErrorResponse> handleException(UserNotFoundException e) {
+        ErrorResponse response = new ErrorResponse(
                 "User not found!",
                 System.currentTimeMillis()
         );
@@ -91,8 +80,8 @@ public class UserController {
     }
 
     @ExceptionHandler
-    private ResponseEntity<AuthErrorResponse> handleException(UserAlreadyExistsException e) {
-        AuthErrorResponse response = new AuthErrorResponse(
+    private ResponseEntity<ErrorResponse> handleException(UserAlreadyExistsException e) {
+        ErrorResponse response = new ErrorResponse(
                 "User is already exists!",
                 System.currentTimeMillis()
         );
@@ -100,8 +89,8 @@ public class UserController {
     }
 
     @ExceptionHandler
-    private ResponseEntity<AuthErrorResponse> handleException(EmailAlreadyExistsException e) {
-        AuthErrorResponse response = new AuthErrorResponse(
+    private ResponseEntity<ErrorResponse> handleException(EmailAlreadyExistsException e) {
+        ErrorResponse response = new ErrorResponse(
                 "Email is already exists!",
                 System.currentTimeMillis()
         );
