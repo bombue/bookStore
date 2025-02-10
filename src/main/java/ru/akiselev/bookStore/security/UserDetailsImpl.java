@@ -25,10 +25,9 @@ public class UserDetailsImpl implements UserDetails {
         return new UserDetailsImpl(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), authorities);
     }
 
-    // todo тут вроде роли надо вернуть
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return authorities;
     }
 
     @Override

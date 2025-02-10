@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.akiselev.bookStore.enums.Role;
@@ -11,6 +12,7 @@ import ru.akiselev.bookStore.models.User;
 import ru.akiselev.bookStore.repositories.UserRepository;
 import ru.akiselev.bookStore.security.UserDetailsImpl;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -31,24 +33,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
         return UserDetailsImpl.build(user.get());
     }
-
-    @Transactional
-    public void signup(User user) {
-        user.setRole(Role.GUEST);
-        userRepository.save(user);
-    }
-
-    public Boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
-    }
-
-    public Boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
-    }
-//
-//    @Transactional
-//    public void signin(User user) {
-//
-//    }
 
 }

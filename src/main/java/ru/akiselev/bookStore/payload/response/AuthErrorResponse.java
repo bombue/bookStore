@@ -1,4 +1,4 @@
-package ru.akiselev.bookStore.untils;
+package ru.akiselev.bookStore.payload.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
