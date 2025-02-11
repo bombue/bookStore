@@ -1,18 +1,13 @@
 package ru.akiselev.bookStore.services;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.akiselev.bookStore.dto.BookDTO;
 import ru.akiselev.bookStore.mapper.BookMapper;
 import ru.akiselev.bookStore.models.Book;
 import ru.akiselev.bookStore.models.BookFilter;
+import ru.akiselev.bookStore.payload.exceptions.BookNotFoundException;
 import ru.akiselev.bookStore.repositories.BooksRepository;
 //import ru.akiselev.bookStore.repositories.CustomBookRepositoryImpl;
 
@@ -29,12 +24,16 @@ public class BooksService {
     private final BookMapper bookMapper;
 
     @Transactional
-    public void create(BookDTO bookDTO) {
-        booksRepository.save(bookMapper.toBook(bookDTO));
+    public BookDTO create(BookDTO bookDTO) {
+        return bookMapper.toDto(booksRepository.save(bookMapper.toBook(bookDTO)));
     }
 
-    public BookDTO read(Long id) {
-        return bookMapper.toDto(booksRepository.findById(id).orElse(null));
+    public BookDTO readDto(Long id) {
+        return booksRepository.findById(id).map(bookMapper::toDto).orElseThrow(() -> new BookNotFoundException(id));
+    }
+
+    public Book read(Long id) {
+        return booksRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
     }
 
     @Transactional

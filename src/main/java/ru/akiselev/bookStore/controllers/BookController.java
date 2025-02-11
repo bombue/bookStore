@@ -1,7 +1,6 @@
 package ru.akiselev.bookStore.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +10,6 @@ import ru.akiselev.bookStore.models.BookFilter;
 import ru.akiselev.bookStore.services.BooksService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,14 +19,13 @@ public class BookController {
     private final BooksService booksService;
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody BookDTO bookDTO) {
-        booksService.create(bookDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+    public ResponseEntity<?> create(@RequestBody BookDTO bookDTO) {
+        return ResponseEntity.ok(booksService.create(bookDTO));
     }
 
     @GetMapping("/{id}")
     private BookDTO read(@PathVariable("id") Long id) {
-        return booksService.read(id);
+        return booksService.readDto(id);
     }
 
     @PatchMapping("/{id}")

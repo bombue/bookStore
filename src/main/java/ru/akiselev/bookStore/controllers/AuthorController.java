@@ -16,14 +16,13 @@ public class AuthorController {
     private final AuthorsService authorsService;
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody AuthorDTO authorDTO) {
-        authorsService.create(authorDTO);
-        return ResponseEntity.ok(HttpStatus.OK);
+    public ResponseEntity<?> create(@RequestBody AuthorDTO authorDTO) {
+        return ResponseEntity.ok(authorsService.create(authorDTO));
     }
 
     @GetMapping("/{id}")
     public AuthorDTO read(@PathVariable("id") Long id) {
-        return authorsService.read(id);
+        return authorsService.readDto(id);
     }
 
     @DeleteMapping("/{id}")
@@ -35,7 +34,7 @@ public class AuthorController {
     @ExceptionHandler
     private ResponseEntity<ErrorResponse> handleException(AuthorNotFoundException e) {
         ErrorResponse response = new ErrorResponse(
-                "Author not found!",
+                e.getMessage(),
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);

@@ -36,44 +36,20 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignUpDTO signUpDTO) {
-        if (usersService.existsByUsername(signUpDTO.getUsername())) {
-            throw new UserAlreadyExistsException();
-        }
-        if (usersService.existsByEmail(signUpDTO.getEmail())) {
-            throw new EmailAlreadyExistsException();
-        }
-
         usersService.create(signUpDTO);
-        emailService.sendSimpleEmail(signUpDTO.getEmail(), "registration", "bookStore registration");
+        emailService.sendSimpleEmail(signUpDTO.email(), "registration", "bookStore registration");
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping("/signin")
     public ResponseEntity<?> signin(@RequestBody SignInDTO signInDTO) {
-        if (!usersService.existsByUsername(signInDTO.getUsername())) {
-            throw new UserNotFoundException();
-        }
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(signInDTO.getUsername(), signInDTO.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
-
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles));
+        return ResponseEntity.ok(usersService.signIn(signInDTO));
     }
 
     @ExceptionHandler
     private ResponseEntity<ErrorResponse> handleException(UserNotFoundException e) {
         ErrorResponse response = new ErrorResponse(
-                "User not found!",
+                e.getMessage(),
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
@@ -82,7 +58,7 @@ public class UserController {
     @ExceptionHandler
     private ResponseEntity<ErrorResponse> handleException(UserAlreadyExistsException e) {
         ErrorResponse response = new ErrorResponse(
-                "User is already exists!",
+                e.getMessage(),
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -91,7 +67,7 @@ public class UserController {
     @ExceptionHandler
     private ResponseEntity<ErrorResponse> handleException(EmailAlreadyExistsException e) {
         ErrorResponse response = new ErrorResponse(
-                "Email is already exists!",
+                e.getMessage(),
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
