@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import ru.akiselev.bookStore.dto.RegisteredUserDTO;
 import ru.akiselev.bookStore.dto.SignInDTO;
 import ru.akiselev.bookStore.dto.SignUpDTO;
 import ru.akiselev.bookStore.email.EmailService;
@@ -29,20 +30,23 @@ import java.util.stream.Collectors;
 @RequestMapping("/auth")
 public class UserController {
 
-    private final JwtUtils jwtUtils;
-    private final AuthenticationManager authenticationManager;
     private final UsersService usersService;
     private final EmailService emailService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignUpDTO signUpDTO) {
-        usersService.create(signUpDTO);
-        emailService.sendSimpleEmail(signUpDTO.email(), "registration", "bookStore registration");
+        emailService.sendRegistrationEmail(usersService.create(signUpDTO));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping("/signin")
     public ResponseEntity<?> signin(@RequestBody SignInDTO signInDTO) {
         return ResponseEntity.ok(usersService.signIn(signInDTO));
+    }
+
+    @PostMapping("/register/{generatedUrl}")
+    private ResponseEntity<?> finishRegistration(@PathVariable("generatedUrl") String generatedUrl) {
+        usersService.finishRegistration(generatedUrl);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }

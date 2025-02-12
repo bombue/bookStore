@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.akiselev.bookStore.dto.RegisteredUserDTO;
 import ru.akiselev.bookStore.dto.SignInDTO;
 import ru.akiselev.bookStore.dto.SignUpDTO;
 import ru.akiselev.bookStore.enums.Role;
@@ -17,6 +18,7 @@ import ru.akiselev.bookStore.models.User;
 import ru.akiselev.bookStore.payload.exceptions.EmailAlreadyExistsException;
 import ru.akiselev.bookStore.payload.exceptions.UserAlreadyExistsException;
 import ru.akiselev.bookStore.payload.exceptions.UserNotFoundException;
+import ru.akiselev.bookStore.payload.exceptions.WrongUrlAuthException;
 import ru.akiselev.bookStore.payload.response.JwtResponse;
 import ru.akiselev.bookStore.repositories.UserRepository;
 import ru.akiselev.bookStore.security.UserDetailsImpl;
@@ -24,6 +26,7 @@ import ru.akiselev.bookStore.security.jwt.JwtUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -36,7 +39,7 @@ public class UsersService {
     private final JwtUtils jwtUtils;
 
     @Transactional
-    public void create(SignUpDTO signUpDTO) {
+    public RegisteredUserDTO create(SignUpDTO signUpDTO) {
         if (existsByUsername(signUpDTO.username())) {
             throw new UserAlreadyExistsException(signUpDTO.username());
         }
@@ -46,7 +49,9 @@ public class UsersService {
         User user = userMapper.fromSignUpDto(signUpDTO);
         user.setRole(Role.GUEST);
         user.setCreatedDate(LocalDateTime.now());
+        user.setGeneratedUrl(UUID.randomUUID().toString());
         userRepository.save(user);
+        return userMapper.toRegisteredUserDTO(user);
     }
 
     public JwtResponse signIn(SignInDTO signInDTO) {
@@ -66,6 +71,23 @@ public class UsersService {
                 userDetails.getUsername(),
                 userDetails.getEmail(),
                 roles);
+    }
+
+    @Transactional
+    public void finishRegistration(String generatedUrl) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        User user = userRepository.findByGeneratedUrl(generatedUrl).orElseThrow(() -> new WrongUrlAuthException(generatedUrl));
+
+        // проверим что по ссылке пришел верный пользователь и что есть он
+        if (!user.getUsername().equals(userDetails.getUsername())) {
+            throw new WrongUrlAuthException(generatedUrl, user.getUsername());
+        }
+
+        user.setRole(Role.USER);
+        user.setGeneratedUrl(null);
+        userRepository.save(user);
     }
 
     public Boolean existsByUsername(String username) {
