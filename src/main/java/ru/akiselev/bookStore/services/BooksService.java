@@ -28,12 +28,8 @@ public class BooksService {
         return bookMapper.toDto(booksRepository.save(bookMapper.toBook(bookDTO)));
     }
 
-    public BookDTO readDto(Long id) {
+    public BookDTO read(Long id) {
         return booksRepository.findById(id).map(bookMapper::toDto).orElseThrow(() -> new BookNotFoundException(id));
-    }
-
-    public Book read(Long id) {
-        return booksRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
     }
 
     @Transactional

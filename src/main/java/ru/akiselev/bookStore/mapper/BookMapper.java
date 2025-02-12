@@ -30,7 +30,7 @@ public abstract class BookMapper {
                 .brand(book.getBrand())
                 .cover(book.getCover())
                 .count(book.getCount())
-                .authorId(book.getAuthor().getId())
+                .authorId(book.getAuthor()==null ? null : book.getAuthor().getId())
                 .build();
     }
 }

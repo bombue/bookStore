@@ -22,7 +22,7 @@ public class AuthorController {
 
     @GetMapping("/{id}")
     public AuthorDTO read(@PathVariable("id") Long id) {
-        return authorsService.readDto(id);
+        return authorsService.read(id);
     }
 
     @DeleteMapping("/{id}")

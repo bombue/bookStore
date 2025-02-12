@@ -25,7 +25,7 @@ public class BookController {
 
     @GetMapping("/{id}")
     private BookDTO read(@PathVariable("id") Long id) {
-        return booksService.readDto(id);
+        return booksService.read(id);
     }
 
     @PatchMapping("/{id}")
@@ -40,16 +40,9 @@ public class BookController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @GetMapping("/filter")
-    private List<BookDTO> findByFilter(@RequestParam(required = false, name = "name") String name,
-                                       @RequestParam(required = false, name = "brand") String brand,
-                                       @RequestParam(required = false, name = "cover") Cover cover,
-                                       @RequestParam(required = false, name = "authorFirstName") String authorFirstName,
-                                       @RequestParam(required = false, name = "authorLastName") String authorLastName,
-                                       @RequestParam(required = false, name = "count") Integer count
-                                       ) {
-        BookFilter filter = new BookFilter(name, brand, cover, authorFirstName, authorLastName, count);
-        return booksService.findByFilter(filter);
+    @PostMapping("/filter")
+    public ResponseEntity<?> findByFilter(@RequestBody BookFilter filter) {
+        return ResponseEntity.ok(booksService.findByFilter(filter));
     }
 
 }
