@@ -8,46 +8,27 @@ import org.springframework.stereotype.Repository;
 import ru.akiselev.bookStore.enums.Cover;
 import ru.akiselev.bookStore.models.Book;
 import ru.akiselev.bookStore.models.BookFilter;
+import ru.akiselev.bookStore.models.Book_;
 
 import java.util.List;
 
 @Repository
 public interface BooksRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
     interface Specs {
-        static Specification<Book> byName(String name) {
-            return ((root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("name"), name));
-        }
-
-        static Specification<Book> byBrand(String brand) {
-            return ((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("brand"), brand));
-        }
-
-        static Specification<Book> byCover(Cover cover) {
-            return ((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("cover"), cover));
-        }
-
-        static Specification<Book> byCount(Integer count) {
-            return ((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("count"), count));
-        }
-
         static Specification<Book> byFilter(BookFilter filter) {
             return ((root, query, criteriaBuilder) -> {
                 Predicate predicate = criteriaBuilder.conjunction();
                 if (filter.getName() != null) {
-                    predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("name"), filter.getName()));
+                    predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get(Book_.name), filter.getName()));
                 }
                 if (filter.getBrand() != null) {
-                    predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("brand"), filter.getBrand()));
+                    predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get(Book_.brand), filter.getBrand()));
                 }
                 if (filter.getCover() != null) {
-                    predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("cover"), filter.getCover()));
+                    predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get(Book_.cover), filter.getCover()));
                 }
                 if (filter.getCount() != null) {
-                    predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("count"), filter.getCount()));
+                    predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get(Book_.count), filter.getCount()));
                 }
                 return predicate;
             });

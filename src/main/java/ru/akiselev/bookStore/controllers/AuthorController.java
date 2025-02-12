@@ -30,13 +30,4 @@ public class AuthorController {
         authorsService.delete(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
-
-    @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(AuthorNotFoundException e) {
-        ErrorResponse response = new ErrorResponse(
-                e.getMessage(),
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
 }

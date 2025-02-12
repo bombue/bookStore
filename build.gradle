@@ -47,7 +47,7 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.4.2'
 	compileOnly 'org.hibernate.orm:hibernate-jpamodelgen:6.6.6.Final'
-
+	annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen:6.6.6.Final'
 }
 
 tasks.named('test') {

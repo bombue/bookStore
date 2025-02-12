@@ -45,31 +45,4 @@ public class UserController {
     public ResponseEntity<?> signin(@RequestBody SignInDTO signInDTO) {
         return ResponseEntity.ok(usersService.signIn(signInDTO));
     }
-
-    @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(UserNotFoundException e) {
-        ErrorResponse response = new ErrorResponse(
-                e.getMessage(),
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(UserAlreadyExistsException e) {
-        ErrorResponse response = new ErrorResponse(
-                e.getMessage(),
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    private ResponseEntity<ErrorResponse> handleException(EmailAlreadyExistsException e) {
-        ErrorResponse response = new ErrorResponse(
-                e.getMessage(),
-                System.currentTimeMillis()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
 }
