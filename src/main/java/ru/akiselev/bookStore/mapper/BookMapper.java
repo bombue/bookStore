@@ -34,26 +34,3 @@ public abstract class BookMapper {
                 .build();
     }
 }
-
-//@Mapper
-//public interface BookMapper {
-//    @Mapping(source = "authorId", target = "author", qualifiedByName = "authorIdToAuthor")
-//    Book toBook(BookDTO bookDTO);
-//    @Mapping(source = "author.id", target = "author_id")
-//    BookDTO toDto(Book book);
-//    @Named("authorIdToAuthor")
-//    static Author authorIdToAuthor(Long authorId) {
-//        Author author = new Author();
-//        author.setId(authorId);
-//        return author;
-//    }
-//    @Named("authorToAuthorId")
-//    static Long authorToAuthorId(Author author) {
-//        if (author != null) {
-//            return author.getId();
-//        }
-//        else {
-//            return null;
-//        }
-//    }
-//}

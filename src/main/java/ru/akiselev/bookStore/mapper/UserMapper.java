@@ -19,6 +19,3 @@ public abstract class UserMapper {
                 .build();
     }
 }
-//public interface UserMapper {
-//    User fromSignUpDto(SignUpDTO signUpDTO);
-//}
