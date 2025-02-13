@@ -15,4 +15,5 @@
     <include file="create-changeset-userInfo-table.xml" relativeToChangelogFile="true"/>
     <include file="create-changeset-user_info-table.xml" relativeToChangelogFile="true"/>
     <include file="alter-changeset-user_info-table.xml" relativeToChangelogFile="true"/>
+    <include file="alter-changeset-user_info-table2.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

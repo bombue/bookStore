@@ -41,4 +41,7 @@ public class User {
 
     @Column(name = "generated_url")
     private String generatedUrl;
+
+    @Column(name = "email_sent")
+    private Boolean emailSentFlag;
 }

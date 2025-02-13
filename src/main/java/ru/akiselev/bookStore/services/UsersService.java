@@ -50,6 +50,7 @@ public class UsersService {
         user.setRole(Role.GUEST);
         user.setCreatedDate(LocalDateTime.now());
         user.setGeneratedUrl(UUID.randomUUID().toString());
+        user.setEmailSentFlag(false);
         userRepository.save(user);
         return userMapper.toRegisteredUserDTO(user);
     }

@@ -6,7 +6,6 @@ import ru.akiselev.bookStore.dto.BookDTO;
 import ru.akiselev.bookStore.models.Book;
 import ru.akiselev.bookStore.payload.exceptions.AuthorNotFoundException;
 import ru.akiselev.bookStore.repositories.AuthorsRepository;
-import ru.akiselev.bookStore.services.AuthorsService;
 
 @Mapper
 public abstract class BookMapper {
