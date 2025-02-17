@@ -5,6 +5,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 @Aspect
 @Component
 @Slf4j
+@ConditionalOnProperty(name = "aop.logging.enabled", matchIfMissing = false)
 public class LoggingAspect {
 
     // будем логировать вход/выход всех паблик методов
