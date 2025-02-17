@@ -5,8 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.akiselev.bookStore.dto.AuthorDTO;
-import ru.akiselev.bookStore.payload.exceptions.AuthorNotFoundException;
-import ru.akiselev.bookStore.payload.response.ErrorResponse;
 import ru.akiselev.bookStore.services.AuthorsService;
 
 @RestController
@@ -16,7 +14,7 @@ public class AuthorController {
     private final AuthorsService authorsService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody AuthorDTO authorDTO) {
+    public ResponseEntity<AuthorDTO> create(@RequestBody AuthorDTO authorDTO) {
         return ResponseEntity.ok(authorsService.create(authorDTO));
     }
 

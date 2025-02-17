@@ -1,6 +1,9 @@
 package ru.akiselev.bookStore.mapper;
 
+import jdk.jfr.Name;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.akiselev.bookStore.dto.AuthorDTO;
 import ru.akiselev.bookStore.models.Author;
@@ -14,22 +17,16 @@ import java.util.Optional;
 
 @Mapper
 public abstract class AuthorMapper {
-    @Autowired
-    protected BooksRepository booksRepository;
+    @Mapping(target = "firstName", expression = "java(authorDTO.createFirstName())")
+    @Mapping(target = "lastName", expression = "java(authorDTO.createLastName())")
+    public abstract Author toAuthor(AuthorDTO authorDTO);
 
-    public Author toAuthor(AuthorDTO authorDTO) {
-        return new Author(authorDTO.id(),
-                List.of(authorDTO.authorName().split(" ")).get(0),
-                List.of(authorDTO.authorName().split(" ")).get(1),
-                authorDTO.bookIds().stream().map(id -> booksRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id))).toList()
-        );
-    }
+    @Mapping(target = "bookIds", source = "bookList", qualifiedByName = "getBookIds")
+    @Mapping(target = "authorName", expression = "java(author.getFirstName() + \" \" + author.getLastName())")
+    public abstract AuthorDTO toDto(Author author);
 
-    public AuthorDTO toDto(Author author) {
-        return AuthorDTO.builder()
-                .id(author.getId())
-                .authorName(String.format("%s %s", author.getFirst_name(), author.getLast_name()))
-                .bookIds(author.getBookList().stream().map(Book::getId).toList())
-                .build();
+    @Named("getBookIds")
+    public List<Long> getBookIds(List<Book> books) {
+        return books.stream().map(Book::getId).toList();
     }
 }

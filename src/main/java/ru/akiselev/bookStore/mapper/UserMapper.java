@@ -12,19 +12,7 @@ import ru.akiselev.bookStore.models.User;
 public abstract class UserMapper {
     @Autowired
     protected PasswordEncoder passwordEncoder;
-    public User fromSignUpDto(SignUpDTO signUpDTO) {
-        return User.builder()
-                .username(signUpDTO.username())
-                .password(passwordEncoder.encode(signUpDTO.password()))
-                .email(signUpDTO.email())
-                .build();
-    }
+    public abstract User fromSignUpDto(SignUpDTO signUpDTO);
 
-    public RegisteredUserDTO toRegisteredUserDTO(User user) {
-        return RegisteredUserDTO.builder()
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .generatedUrl(user.getGeneratedUrl())
-                .build();
-    }
+    public abstract RegisteredUserDTO toRegisteredUserDTO(User user);
 }

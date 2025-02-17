@@ -43,6 +43,6 @@ public class EmailService {
     @Transactional
     public void pushUnsentEmails() {
         List<User> usersWithUnsentEmails = userRepository.findAllByEmailSentFlag(false);
-        usersWithUnsentEmails.forEach(user -> sendRegistrationEmail(userMapper.toRegisteredUserDTO(user)));
+        usersWithUnsentEmails.stream().map(userMapper::toRegisteredUserDTO).forEach(this::sendRegistrationEmail);
     }
 }

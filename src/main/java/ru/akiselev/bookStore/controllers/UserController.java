@@ -34,18 +34,18 @@ public class UserController {
     private final EmailService emailService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignUpDTO signUpDTO) {
+    public ResponseEntity<HttpStatus> signup(@RequestBody SignUpDTO signUpDTO) {
         emailService.sendRegistrationEmail(usersService.create(signUpDTO));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<?> signin(@RequestBody SignInDTO signInDTO) {
+    public ResponseEntity<JwtResponse> signin(@RequestBody SignInDTO signInDTO) {
         return ResponseEntity.ok(usersService.signIn(signInDTO));
     }
 
     @PostMapping("/register/{generatedUrl}")
-    private ResponseEntity<?> finishRegistration(@PathVariable("generatedUrl") String generatedUrl) {
+    private ResponseEntity<HttpStatus> finishRegistration(@PathVariable("generatedUrl") String generatedUrl) {
         usersService.finishRegistration(generatedUrl);
         return ResponseEntity.ok(HttpStatus.OK);
     }

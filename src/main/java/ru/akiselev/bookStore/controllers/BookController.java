@@ -19,7 +19,7 @@ public class BookController {
     private final BooksService booksService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody BookDTO bookDTO) {
+    public ResponseEntity<BookDTO> create(@RequestBody BookDTO bookDTO) {
         return ResponseEntity.ok(booksService.create(bookDTO));
     }
 
@@ -28,9 +28,9 @@ public class BookController {
         return booksService.read(id);
     }
 
-    @PatchMapping("/{id}")
-    private ResponseEntity<HttpStatus> update(@PathVariable("id") Long id, @RequestBody BookDTO bookDTO) {
-        booksService.update(id, bookDTO);
+    @PatchMapping
+    private ResponseEntity<HttpStatus> update(@RequestBody BookDTO bookDTO) {
+        booksService.update(bookDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -41,7 +41,7 @@ public class BookController {
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<?> findByFilter(@RequestBody BookFilter filter) {
+    public ResponseEntity<List<BookDTO>> findByFilter(@RequestBody BookFilter filter) {
         return ResponseEntity.ok(booksService.findByFilter(filter));
     }
 
