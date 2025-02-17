@@ -1,7 +1,5 @@
 package ru.akiselev.bookStore.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.akiselev.bookStore.enums.Cover;

@@ -28,4 +28,14 @@ public class Author {
 
     @OneToMany(mappedBy = "author")
     private List<Book> bookList = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "Author{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", bookList=" + bookList.stream().map(Book::getId).toList() +
+                '}';
+    }
 }

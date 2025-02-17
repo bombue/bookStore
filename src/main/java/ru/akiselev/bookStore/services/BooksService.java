@@ -51,7 +51,6 @@ public class BooksService {
     }
 
     public List<BookDTO> findByFilter(BookFilter filter) {
-//        Specification<Book> spec = bookSpecification.byFilter(filter);
         return booksRepository.findAll(bookSpecification.byFilter(filter))
                 .stream().map(bookMapper::toDto)
                 .collect(Collectors.toList());
