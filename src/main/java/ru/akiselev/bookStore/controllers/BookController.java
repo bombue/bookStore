@@ -44,5 +44,4 @@ public class BookController {
     public ResponseEntity<List<BookDTO>> findByFilter(@RequestBody BookFilter filter) {
         return ResponseEntity.ok(booksService.findByFilter(filter));
     }
-
 }

@@ -12,17 +12,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import ru.akiselev.bookStore.controllers.AuthorController;
 import ru.akiselev.bookStore.dto.AuthorDTO;
-import ru.akiselev.bookStore.payload.exceptions.AuthorNotFoundException;
 import ru.akiselev.bookStore.services.AuthorsService;
 
 import java.util.Collections;
-import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthorControllerTest {
