@@ -13,9 +13,14 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.akiselev.bookStore.dto.BookDTO;
 import ru.akiselev.bookStore.enums.Cover;
+import ru.akiselev.bookStore.models.BookFilter;
 import ru.akiselev.bookStore.security.jwt.AuthTokenFilter;
 import ru.akiselev.bookStore.services.BooksService;
 
+import java.util.Collections;
+import java.util.List;
+
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 //import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -63,7 +68,7 @@ public class BookControllerTest {
 
     @Test
     void createBook_ShouldReturnCreatedBook() throws Exception {
-        // Arrange
+        // setup
         BookDTO bookDTO = new BookDTO(1L, "Book Title", "Book brand", Cover.HARD, 1, 1L);
         when(booksService.create(bookDTO)).thenReturn(bookDTO);
 
@@ -82,4 +87,60 @@ public class BookControllerTest {
                 .andExpect(jsonPath("authorId").value(1));
     }
 
+    @Test
+    void patchBook_ShouldReturnOk() throws Exception {
+        // setup
+        BookDTO bookDTO = new BookDTO(1L, "Book Title", "Book brand", Cover.HARD, 1, 1L);
+        doNothing().when(booksService).update(bookDTO);
+
+        // go
+        ResultActions result = mockMvc.perform(patch("/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bookDTO)));
+
+        // assert
+        result.andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteBook_ShouldReturnOkStatus() throws Exception {
+        // Arrange
+        doNothing().when(booksService).delete(1L);
+
+        // Act
+        ResultActions result = mockMvc.perform(delete("/books/1"));
+
+        // Assert
+        result.andExpect(status().isOk());
+    }
+
+    @Test
+    void findByFilter_ShouldReturnFilteredBooks() throws Exception {
+        // Arrange
+        BookFilter filter = new BookFilter();
+        filter.setName("Book Title");
+        filter.setBrand("Book brand");
+        filter.setCover(Cover.HARD);
+        filter.setCount(1);
+        filter.setAuthorLastName("lastName");
+        filter.setAuthorFirstName("firstName");
+
+
+        List<BookDTO> books = Collections.singletonList(new BookDTO(1L, "Book Title", "Book brand", Cover.HARD, 1, 1L));
+        when(booksService.findByFilter(filter)).thenReturn(books);
+
+        // Act
+        ResultActions result = mockMvc.perform(post("/books/filter")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(filter)));
+
+        // Assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("Book Title"))
+                .andExpect(jsonPath("$[0].brand").value("Book brand"))
+                .andExpect(jsonPath("$[0].cover").value(Cover.HARD.toString()))
+                .andExpect(jsonPath("$[0].count").value(1))
+                .andExpect(jsonPath("$[0].authorId").value(1));
+    }
 }

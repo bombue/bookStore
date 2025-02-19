@@ -8,7 +8,6 @@ import ru.akiselev.bookStore.mapper.AuthorMapper;
 import ru.akiselev.bookStore.models.Author;
 import ru.akiselev.bookStore.payload.exceptions.AuthorNotFoundException;
 import ru.akiselev.bookStore.repositories.AuthorsRepository;
-import ru.akiselev.bookStore.repositories.BooksRepository;
 
 @RequiredArgsConstructor
 @Service

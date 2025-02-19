@@ -1,11 +1,8 @@
 package ru.akiselev.bookStore.email;
 
 import lombok.RequiredArgsConstructor;
-import org.mapstruct.control.MappingControl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.akiselev.bookStore.dto.RegisteredUserDTO;
@@ -15,7 +12,6 @@ import ru.akiselev.bookStore.payload.exceptions.UserNotFoundException;
 import ru.akiselev.bookStore.repositories.UserRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -39,7 +35,7 @@ public class EmailService {
         userRepository.save(user);
     }
 
-    @Scheduled(fixedDelay = 2000)
+//    @Scheduled(fixedDelay = 2000)
     @Transactional
     public void pushUnsentEmails() {
         List<User> usersWithUnsentEmails = userRepository.findAllByEmailSentFlag(false);
