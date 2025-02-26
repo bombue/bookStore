@@ -17,7 +17,7 @@ import java.util.Map;
 public class KafkaEmailProducerConfig {
     @Value(value = "${spring.kafka.bootstrap-servers}")
     private String bootstrapAddress;
-//
+
     @Bean
     public ProducerFactory<String, RegisteredUserDTO> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
