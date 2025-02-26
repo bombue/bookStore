@@ -3,6 +3,7 @@ package ru.akiselev.bookStore.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,11 +32,14 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UsersService usersService;
-    private final EmailService emailService;
+//    private final EmailService emailService;
+    private final KafkaTemplate<String, RegisteredUserDTO> kafkaTemplate;
 
     @PostMapping("/signup")
     public ResponseEntity<HttpStatus> signup(@RequestBody SignUpDTO signUpDTO) {
-        emailService.sendRegistrationEmail(usersService.create(signUpDTO));
+        RegisteredUserDTO registeredUserDTO = usersService.create(signUpDTO);
+        kafkaTemplate.send("akiselev", registeredUserDTO);
+//        emailService.sendRegistrationEmail(usersService.create(signUpDTO));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
