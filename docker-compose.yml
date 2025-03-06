@@ -43,12 +43,12 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
-#      - kafka
+      - kafka
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bookStore
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: spring
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
   # Модуль email-sender
   email-sender:
@@ -59,12 +59,12 @@ services:
       - "8081:8081"
     depends_on:
       - postgres
-#      - kafka
+      - kafka
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bookStore
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: spring
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
 # Тома для данных PostgreSQL
 volumes:
