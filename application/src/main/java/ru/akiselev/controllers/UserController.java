@@ -3,12 +3,13 @@ package ru.akiselev.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 import ru.akiselev.dto.RegisteredUserDTO;
 import ru.akiselev.dto.SignInDTO;
 import ru.akiselev.dto.SignUpDTO;
+import ru.akiselev.enums.KafkaTopics;
 import ru.akiselev.payload.response.JwtResponse;
+import ru.akiselev.services.KafkaService;
 import ru.akiselev.services.UsersService;
 
 @RestController
@@ -17,12 +18,12 @@ import ru.akiselev.services.UsersService;
 public class UserController {
 
     private final UsersService usersService;
-    private final KafkaTemplate<String, RegisteredUserDTO> kafkaTemplate;
+    private final KafkaService kafkaService;
 
     @PostMapping("/signup")
     public ResponseEntity<HttpStatus> signup(@RequestBody SignUpDTO signUpDTO) {
         RegisteredUserDTO registeredUserDTO = usersService.create(signUpDTO);
-        kafkaTemplate.send("emailNotifications", registeredUserDTO);
+        kafkaService.send(KafkaTopics.emailNotifications, registeredUserDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

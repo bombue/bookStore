@@ -19,7 +19,7 @@ public class EmailService {
     private final JavaMailSender emailSender;
     private final UserRepository userRepository;
 
-    @KafkaListener(topics = "emailNotifications", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "emailNotifications", groupId = "emailService")
     @Transactional
     public void listenEmailEvents(RegisteredUserDTO registeredUserDTO) {
         SimpleMailMessage message = new SimpleMailMessage();
