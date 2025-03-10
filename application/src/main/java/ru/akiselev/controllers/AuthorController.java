@@ -1,5 +1,6 @@
 package ru.akiselev.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ public class AuthorController {
     private final AuthorsService authorsService;
 
     @PostMapping
-    public ResponseEntity<AuthorDTO> create(@RequestBody AuthorDTO authorDTO) {
+    public ResponseEntity<AuthorDTO> create(@Valid @RequestBody AuthorDTO authorDTO) {
         return ResponseEntity.ok(authorsService.create(authorDTO));
     }
 

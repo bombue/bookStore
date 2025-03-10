@@ -1,5 +1,6 @@
 package ru.akiselev.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class BookController {
     private final BooksService booksService;
 
     @PostMapping
-    public ResponseEntity<BookDTO> create(@RequestBody BookDTO bookDTO) {
+    public ResponseEntity<BookDTO> create(@Valid @RequestBody BookDTO bookDTO) {
         return ResponseEntity.ok(booksService.create(bookDTO));
     }
 
@@ -28,7 +29,7 @@ public class BookController {
     }
 
     @PatchMapping
-    private ResponseEntity<HttpStatus> update(@RequestBody BookDTO bookDTO) {
+    private ResponseEntity<HttpStatus> update(@Valid @RequestBody BookDTO bookDTO) {
         booksService.update(bookDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
