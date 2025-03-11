@@ -14,9 +14,14 @@ subprojects {
 		mavenCentral()
 	}
 
+	ext {
+		set('springCloudVersion', "2024.0.0")
+	}
+
 	dependencyManagement {
 		imports {
 			mavenBom("org.springframework.boot:spring-boot-dependencies:3.4.2")
+			mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 		}
 	}
 

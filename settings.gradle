@@ -1,2 +1,3 @@
+include 'discoveryService'
 include 'application'
 include 'email-sender'

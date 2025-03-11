@@ -4,19 +4,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.akiselev.dto.RegisteredUserDTO;
 import ru.akiselev.dto.SignInDTO;
 import ru.akiselev.dto.SignUpDTO;
-import ru.akiselev.enums.KafkaTopics;
-import ru.akiselev.payload.exceptions.UserAlreadyExistsException;
 import ru.akiselev.payload.response.JwtResponse;
 import ru.akiselev.services.KafkaService;
 import ru.akiselev.services.UsersService;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
