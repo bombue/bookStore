@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     private String jwtSecret;
 
     @Autowired
-    Environment env;
+    private Environment env;
 
     public JwtAuthenticationFilter() {
         super(Config.class);
