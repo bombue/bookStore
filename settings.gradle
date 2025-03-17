@@ -1,5 +1,6 @@
 include 'discoveryService'
 include 'apiGateway'
+include 'configurationServer'
 include 'application'
 include 'email-sender'
 include 'ws-book'

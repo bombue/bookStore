@@ -72,6 +72,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
                         .getBody();
 
                 // Добавляем claims в заголовки для дальнейшего использования
+                // todo. Не обязательно добавлять эти claims, но мб дальше будут нужны
                 ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
                         .header("username", claims.getSubject())
                         .header("roles", claims.get("roles", List.class).toString())
