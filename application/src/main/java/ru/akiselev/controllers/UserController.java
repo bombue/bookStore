@@ -2,6 +2,7 @@ package ru.akiselev.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ public class UserController {
 
     private final UsersService usersService;
     private final KafkaService kafkaService;
+    private final Environment env;
 
     @PostMapping("/signup")
     public ResponseEntity<HttpStatus> signup(@Valid @RequestBody SignUpDTO signUpDTO) {
@@ -36,5 +38,10 @@ public class UserController {
     private ResponseEntity<HttpStatus> finishRegistration(@PathVariable("generatedUrl") String generatedUrl) {
         usersService.finishRegistration(generatedUrl);
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @GetMapping("/check")
+    public String status() {
+        return String.format("Working on port %s, with %s", env.getProperty("local.server.port"), env.getProperty("jwt.secret"));
     }
 }
