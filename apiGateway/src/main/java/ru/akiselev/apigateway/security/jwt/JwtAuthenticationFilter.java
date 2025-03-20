@@ -34,6 +34,10 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     @Autowired
     private Environment env;
 
+    public static class Config {
+        // Конфигурация фильтра (если нужно)
+    }
+
     public JwtAuthenticationFilter() {
         super(Config.class);
     }
@@ -42,20 +46,34 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
-            String path = request.getPath().toString();
 
-            // Пропускаем запросы на исключенные пути
-            if (Arrays.stream(excludedPaths).anyMatch(path::startsWith)) {
-                return chain.filter(exchange);
+            if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+                return onError(exchange, "No authorization header", HttpStatus.UNAUTHORIZED);
             }
 
-            // Проверяем наличие токена в заголовке Authorization
-            String token = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-            if (token==null || !token.startsWith("Bearer ")) {
-                return this.onError(exchange, "Authorization header is missing or invalid", HttpStatus.UNAUTHORIZED);
+            String authorizationHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+            String jwt = authorizationHeader.replace("Bearer ", "");
+
+            if (!isJwtValid(jwt)) {
+                return onError(exchange, "JWT is not valid", HttpStatus.UNAUTHORIZED);
             }
 
-            token = token.substring(7); // Убираем "Bearer "
+            return chain.filter(exchange);
+
+//            String path = request.getPath().toString();
+//
+//            // Пропускаем запросы на исключенные пути
+//            if (Arrays.stream(excludedPaths).anyMatch(path::startsWith)) {
+//                return chain.filter(exchange);
+//            }
+//
+//            // Проверяем наличие токена в заголовке Authorization
+//            String token = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+//            if (token==null || !token.startsWith("Bearer ")) {
+//                return this.onError(exchange, "Authorization header is missing or invalid", HttpStatus.UNAUTHORIZED);
+//            }
+//
+//            token = token.substring(7); // Убираем "Bearer "
 
 //            if (!validateJwtToken(token)) {
 //                return this.onError(exchange, "Invalid JWT token", HttpStatus.UNAUTHORIZED);
@@ -63,53 +81,60 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
 //
 //            return chain.filter(exchange);
 
-            try {
-                // Валидируем токен
-                Claims claims = Jwts.parser()
-                        .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
-                        .build()
-                        .parseClaimsJws(token)
-                        .getBody();
-
-                // Добавляем claims в заголовки для дальнейшего использования
-                // todo. Не обязательно добавлять эти claims, но мб дальше будут нужны
-                ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
-                        .header("username", claims.getSubject())
-                        .header("roles", claims.get("roles", List.class).toString())
-                        .build();
-
-                return chain.filter(exchange.mutate().request(modifiedRequest).build());
-            } catch (Exception e) {
-                return this.onError(exchange, "Invalid JWT token", HttpStatus.UNAUTHORIZED);
-            }
+//            try {
+//                // Валидируем токен
+//                Claims claims = Jwts.parser()
+//                        .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
+//                        .build()
+//                        .parseClaimsJws(token)
+//                        .getBody();
+//
+//                // Добавляем claims в заголовки для дальнейшего использования
+//                // todo. Не обязательно добавлять эти claims, но мб дальше будут нужны
+//                ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
+//                        .header("username", claims.getSubject())
+//                        .header("roles", claims.get("roles", List.class).toString())
+//                        .build();
+//
+//                return chain.filter(exchange.mutate().request(modifiedRequest).build());
+//            } catch (Exception e) {
+//                return this.onError(exchange, "Invalid JWT token", HttpStatus.UNAUTHORIZED);
+//            }
         };
     }
 
     private Mono<Void> onError(ServerWebExchange exchange, String error, HttpStatus httpStatus) {
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(httpStatus);
+        log.error(error);
         return response.setComplete();
     }
 
-    public static class Config {
-        // Конфигурация фильтра (если нужно)
-    }
+    private boolean isJwtValid(String jwt) {
+        Jwt<Header, Claims> parsedToken = (Jwt<Header, Claims>) Jwts.parser()
+                .setSigningKey(key())
+                .build()
+                .parse(jwt);
 
-    private boolean validateJwtToken(String authToken) {
-        try {
-            Jwts.parser().setSigningKey(key()).build().parse(authToken);
-            return true;
-        } catch (MalformedJwtException e) {
-            log.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            log.error("JWT token is expired: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            log.error("JWT token is unsupported: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.error("JWT claims string is empty: {}", e.getMessage());
-        }
+        String subject = parsedToken.getPayload().getSubject();
 
-        return false;
+
+        return subject != null && !subject.isEmpty();
+
+//        try {
+//            Jwts.parser().setSigningKey(key()).build().parse(jwt);
+//            return true;
+//        } catch (MalformedJwtException e) {
+//            log.error("Invalid JWT token: {}", e.getMessage());
+//        } catch (ExpiredJwtException e) {
+//            log.error("JWT token is expired: {}", e.getMessage());
+//        } catch (UnsupportedJwtException e) {
+//            log.error("JWT token is unsupported: {}", e.getMessage());
+//        } catch (IllegalArgumentException e) {
+//            log.error("JWT claims string is empty: {}", e.getMessage());
+//        }
+
+//        return false;
     }
 
     private Key key() {
