@@ -1,12 +1,13 @@
 package ru.akiselev.wsauthor.dto;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
-public record AuthorDTO(@NotEmpty Long id, @NotEmpty String authorName, List<Long> bookIds) {
+public record AuthorDTO(Long id, @NotEmpty String authorName) {
     public String createFirstName() {
         return List.of(authorName.split(" ")).get(0);
     }
