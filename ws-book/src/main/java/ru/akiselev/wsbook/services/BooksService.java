@@ -12,6 +12,7 @@ import ru.akiselev.wsbook.dto.BookDTO;
 import ru.akiselev.wsbook.exceptions.AuthorNotFoundException;
 import ru.akiselev.wsbook.exceptions.BookNotFoundException;
 import ru.akiselev.wsbook.mapper.BookMapper;
+import ru.akiselev.wsbook.model.AuthorServiceClient;
 import ru.akiselev.wsbook.model.Book;
 import ru.akiselev.wsbook.model.BookFilter;
 import ru.akiselev.wsbook.repositories.BookSpecification;
@@ -26,19 +27,20 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class BooksService {
     private final BooksRepository booksRepository;
-//    private final AuthorsRepository authorsRepository;
     private final BookMapper bookMapper;
     private final BookSpecification bookSpecification;
-    private final RestTemplate restTemplate;
-    private final Environment environment;
+//    private final RestTemplate restTemplate;
+//    private final Environment environment;
+    private final AuthorServiceClient authorServiceClient;
 
     @Transactional
     public BookDTO create(BookDTO bookDTO) {
         Book book = bookMapper.toBook(bookDTO);
-        ResponseEntity<AuthorDTO> authorResponse = restTemplate.getForEntity(String.format("%s/authors/%d", environment.getProperty("author.url"), book.getAuthor_id()), AuthorDTO.class);
-        if (!authorResponse.getStatusCode().equals(HttpStatus.OK)) {
-            throw new AuthorNotFoundException(book.getAuthor_id());
-        }
+//        ResponseEntity<AuthorDTO> authorResponse = restTemplate.getForEntity(String.format("%s/authors/%d", environment.getProperty("author.url"), book.getAuthor_id()), AuthorDTO.class);
+//        if (!authorResponse.getStatusCode().equals(HttpStatus.OK)) {
+//            throw new AuthorNotFoundException(book.getAuthor_id());
+//        }
+        authorServiceClient.getAuthor(book.getAuthor_id()+1);
 
 //        ResponseEntity<AuthorDTO> authorResponse = restTemplate.exchange("", HttpMethod.GET, null, new ParameterizedTypeReference<AuthorDTO>() {
 //        });
@@ -49,11 +51,12 @@ public class BooksService {
 
     public BookDTO read(Long id) {
         Book book = booksRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
-        ResponseEntity<AuthorDTO> authorResponse = restTemplate.getForEntity(String.format("%s/authors/%d", environment.getProperty("author.url"), book.getAuthor_id()), AuthorDTO.class);
-        if (!authorResponse.getStatusCode().equals(HttpStatus.OK)) {
-            throw new AuthorNotFoundException(book.getAuthor_id());
-        }
-        book.setAuthor_id(authorResponse.getBody().id());
+//        ResponseEntity<AuthorDTO> authorResponse = restTemplate.getForEntity(String.format("%s/authors/%d", environment.getProperty("author.url"), book.getAuthor_id()), AuthorDTO.class);
+//        if (!authorResponse.getStatusCode().equals(HttpStatus.OK)) {
+//            throw new AuthorNotFoundException(book.getAuthor_id());
+//        }
+        AuthorDTO authorDTO = authorServiceClient.getAuthor(book.getAuthor_id()+1);
+        book.setAuthor_id(authorDTO.id());
         return bookMapper.toDto(book);
 
 //        return booksRepository.findById(id).map(bookMapper::toDto).orElseThrow(() -> new BookNotFoundException(id));
