@@ -4,8 +4,8 @@ import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import ru.akiselev.wsbook.model.Book;
-import ru.akiselev.wsbook.model.Book_;
 import ru.akiselev.wsbook.model.BookFilter;
+import ru.akiselev.wsbook.model.Book_;
 
 @Component
 public class BookSpecification {

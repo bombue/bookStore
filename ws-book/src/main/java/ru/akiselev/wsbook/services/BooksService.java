@@ -1,11 +1,7 @@
 package ru.akiselev.wsbook.services;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,7 +18,6 @@ import ru.akiselev.wsbook.repositories.BookSpecification;
 import ru.akiselev.wsbook.repositories.BooksRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -40,7 +35,7 @@ public class BooksService {
     @Transactional
     public BookDTO create(BookDTO bookDTO) {
         Book book = bookMapper.toBook(bookDTO);
-        ResponseEntity<AuthorDTO> authorResponse = restTemplate.getForEntity(String.format("%s/%d", environment.getProperty("author.url"), book.getAuthor_id()), AuthorDTO.class);
+        ResponseEntity<AuthorDTO> authorResponse = restTemplate.getForEntity(String.format("%s/authors/%d", environment.getProperty("author.url"), book.getAuthor_id()), AuthorDTO.class);
         if (!authorResponse.getStatusCode().equals(HttpStatus.OK)) {
             throw new AuthorNotFoundException(book.getAuthor_id());
         }
@@ -54,7 +49,7 @@ public class BooksService {
 
     public BookDTO read(Long id) {
         Book book = booksRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
-        ResponseEntity<AuthorDTO> authorResponse = restTemplate.getForEntity(String.format("%s/%d", environment.getProperty("author.url"), book.getAuthor_id()), AuthorDTO.class);
+        ResponseEntity<AuthorDTO> authorResponse = restTemplate.getForEntity(String.format("%s/authors/%d", environment.getProperty("author.url"), book.getAuthor_id()), AuthorDTO.class);
         if (!authorResponse.getStatusCode().equals(HttpStatus.OK)) {
             throw new AuthorNotFoundException(book.getAuthor_id());
         }
