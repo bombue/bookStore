@@ -40,7 +40,7 @@ public class BooksService {
 //        if (!authorResponse.getStatusCode().equals(HttpStatus.OK)) {
 //            throw new AuthorNotFoundException(book.getAuthor_id());
 //        }
-        authorServiceClient.getAuthor(book.getAuthor_id()+1);
+        authorServiceClient.getAuthor(book.getAuthor_id());
 
 //        ResponseEntity<AuthorDTO> authorResponse = restTemplate.exchange("", HttpMethod.GET, null, new ParameterizedTypeReference<AuthorDTO>() {
 //        });
@@ -55,7 +55,7 @@ public class BooksService {
 //        if (!authorResponse.getStatusCode().equals(HttpStatus.OK)) {
 //            throw new AuthorNotFoundException(book.getAuthor_id());
 //        }
-        AuthorDTO authorDTO = authorServiceClient.getAuthor(book.getAuthor_id()+1);
+        AuthorDTO authorDTO = authorServiceClient.getAuthor(book.getAuthor_id());
         book.setAuthor_id(authorDTO.id());
         return bookMapper.toDto(book);
 
