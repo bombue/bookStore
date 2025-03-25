@@ -1,6 +1,5 @@
 package ru.akiselev.wsbook.model;
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +10,6 @@ import ru.akiselev.wsbook.dto.AuthorDTO;
 public interface AuthorServiceClient {
 
     @GetMapping("/authors/{id}")
-    @HystrixCommand(fallbackMethod = "getAuthor")
     AuthorDTO getAuthor(@PathVariable("id") Long id);
 }
 
