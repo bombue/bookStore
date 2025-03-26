@@ -1,6 +1,7 @@
 package ru.akiselev.wsbook.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -55,7 +57,9 @@ public class BooksService {
 //        if (!authorResponse.getStatusCode().equals(HttpStatus.OK)) {
 //            throw new AuthorNotFoundException(book.getAuthor_id());
 //        }
+        log.info("akiselev some message before");
         AuthorDTO authorDTO = authorServiceClient.getAuthor(book.getAuthor_id());
+        log.info("akiselev some message after");
         book.setAuthor_id(authorDTO.id());
         return bookMapper.toDto(book);
 
