@@ -7,11 +7,12 @@ WORKDIR /app
 # Копируем файлы проекта
 COPY build.gradle .
 COPY settings.gradle .
-COPY application/build.gradle ./application/
-COPY application/src ./application/src
+COPY /src ./src
+#COPY application/build.gradle ./application/
+#COPY application/src ./application/src
 
 # Собираем приложение
-RUN gradle :application:bootJar -x test
+RUN gradle :bootJar -x test
 
 # Используем образ OpenJDK для запуска
 FROM openjdk:17-jdk-slim
@@ -20,10 +21,10 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Копируем собранный JAR-файл
-COPY --from=build /app/application/build/libs/application-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/build/libs/ws-user-0.0.1-SNAPSHOT.jar app.jar
 
 # Открываем порт
-EXPOSE 8080
+EXPOSE 8083
 
 # Команда для запуска
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -7,11 +7,12 @@ WORKDIR /app
 # Копируем файлы проекта
 COPY build.gradle .
 COPY settings.gradle .
-COPY ws-book/build.gradle ./ws-book/
-COPY ws-book/src ./ws-book/src
+COPY /src ./src
+#COPY ws-book/build.gradle ./ws-book/
+#COPY ws-book/src ./ws-book/src
 
 # Собираем приложение
-RUN gradle :ws-book:bootJar -x test
+RUN gradle :bootJar -x test
 
 # Используем образ OpenJDK для запуска
 FROM openjdk:17-jdk-slim
@@ -20,7 +21,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Копируем собранный JAR-файл
-COPY --from=build /app/ws-book/build/libs/ws-book-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/build/libs/ws-book-0.0.1-SNAPSHOT.jar app.jar
 
 # Открываем порт
 EXPOSE 8082

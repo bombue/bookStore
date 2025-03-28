@@ -8,10 +8,8 @@ WORKDIR /app
 COPY build.gradle .
 COPY settings.gradle .
 COPY /src ./src
-#COPY email-sender/build.gradle ./email-sender/
-#COPY email-sender/src ./email-sender/src
-#COPY email-sender .
-#COPY email-sender/src src
+#COPY ws-book/build.gradle ./ws-book/
+#COPY ws-book/src ./ws-book/src
 
 # Собираем приложение
 RUN gradle :bootJar -x test
@@ -23,7 +21,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Копируем собранный JAR-файл
-COPY --from=build /app/email-sender/build/libs/email-sender-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/build/libs/ws-author-0.0.1-SNAPSHOT.jar app.jar
 
 # Открываем порт
 EXPOSE 8081

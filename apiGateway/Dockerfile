@@ -8,10 +8,9 @@ WORKDIR /app
 COPY build.gradle .
 COPY settings.gradle .
 COPY /src ./src
-#COPY email-sender/build.gradle ./email-sender/
-#COPY email-sender/src ./email-sender/src
-#COPY email-sender .
-#COPY email-sender/src src
+#COPY configurationServer/build.gradle ./configurationServer/
+#COPY configurationServer/settings.gradle ./configurationServer/
+#COPY configurationServer/src ./configurationServer/src
 
 # Собираем приложение
 RUN gradle :bootJar -x test
@@ -23,10 +22,10 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Копируем собранный JAR-файл
-COPY --from=build /app/email-sender/build/libs/email-sender-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/build/libs/apiGateway-0.0.1-SNAPSHOT.jar app.jar
 
 # Открываем порт
-EXPOSE 8081
+EXPOSE 8020
 
 # Команда для запуска
 ENTRYPOINT ["java", "-jar", "app.jar"]

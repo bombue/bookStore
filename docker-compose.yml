@@ -1,69 +1,237 @@
 services:
-  # PostgreSQL
+  # 1. Config Server + RabbitMQ
+  config-server:
+    build: ./configurationServer
+    container_name: config-server
+    ports:
+      - "8012:8012"
+    environment:
+      - SPRING_PROFILES_ACTIVE=git
+    volumes:
+      - ./ws-config/src/main/resources:/config
+    depends_on:
+      - rabbitmq
+    networks:
+      - bookstore-network
+
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: rabbitmq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=akiselev
+      - RABBITMQ_DEFAULT_PASS=97864522
+    networks:
+      - bookstore-network
+
+  # 2. Eureka Discovery Service
+  discovery-service:
+    build: ./discoveryService
+    container_name: discovery-service
+    ports:
+      - "8010:8010"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - config-server
+    networks:
+      - bookstore-network
+
+  # 3. Spring Cloud Gateway
+  api-gateway:
+    build: ./apiGateway
+    container_name: api-gateway
+    ports:
+      - "8020:8020"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - config-server
+    networks:
+      - bookstore-network
+
+  # 4. PostgreSQL DB
   postgres:
     image: postgres:13
+    container_name: postgres
     environment:
-      POSTGRES_DB: bookStore
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: spring
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=bookstore
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bookstore-network
 
-  # Kafka
+  # 5. Elasticsearch + Kibana
+  elasticsearch:
+    image: artifactory.cinimex.ru/faq_docker/elk/elasticsearch:7.14.2-debian-10-r1
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - bookstore-network
+  kibana:
+    image: artifactory.cinimex.ru/faq_docker/elk/kibana:7.14.2-debian-10-r23
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - bookstore-network
+
+  # 6-8. Микросервисы + Logstash
+  ws-user:
+    build: ./ws-user
+    container_name: ws-user
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8012
+    depends_on:
+      - config-server
+      - discovery-service
+      - postgres
+    volumes:
+      - ./ws-user/logs:/app/logs
+    networks:
+      - bookstore-network
+
+  logstash-user:
+    image: artifactory.cinimex.ru/faq_docker/elk/logstash:7.15.1-debian-10-r6
+    container_name: logstash-user
+    volumes:
+      - ./logstash/user-logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./ws-user/logs:/logs
+    depends_on:
+      - elasticsearch
+    networks:
+      - bookstore-network
+
+  ws-author:
+    build: ./ws-author
+    container_name: ws-author
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8012
+    depends_on:
+      - config-server
+      - discovery-service
+      - postgres
+    volumes:
+      - ./ws-author/logs:/app/logs
+    networks:
+      - bookstore-network
+
+  logstash-author:
+    image: artifactory.cinimex.ru/faq_docker/elk/logstash:7.15.1-debian-10-r6
+    container_name: logstash-author
+    volumes:
+      - ./logstash/author-logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./ws-author/logs:/logs
+    depends_on:
+      - elasticsearch
+    networks:
+      - bookstore-network
+
+  ws-book:
+    build: ./ws-book
+    container_name: ws-book
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8012
+    depends_on:
+      - config-server
+      - discovery-service
+      - postgres
+    volumes:
+      - ./ws-book/logs:/app/logs
+    networks:
+      - bookstore-network
+
+  logstash-book:
+    image: artifactory.cinimex.ru/faq_docker/elk/logstash:7.15.1-debian-10-r6
+    container_name: logstash-book
+    volumes:
+      - ./logstash/book-logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./ws-book/logs:/logs
+    depends_on:
+      - elasticsearch
+    networks:
+      - bookstore-network
+
+  # 9. Kafka
   zookeeper:
-    image: confluentinc/cp-zookeeper:6.2.0
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    networks:
+      - bookstore-network
 
   kafka:
-    image: confluentinc/cp-kafka:6.2.0
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
     depends_on:
       - zookeeper
+    ports:
+      - "9092:9092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_INTERNAL://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    ports:
-      - "9092:9092"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - bookstore-network
 
-  # Модуль application
-  application:
-    build:
-      context: .
-      dockerfile: application/Dockerfile
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-      - kafka
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bookStore
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: spring
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  # 10. Email Sender
+#  email-sender:
+#    build: ./email-sender
+#    container_name: email-sender
+#    ports:
+#      - "8084:8084"
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=dev
+#      - SPRING_CLOUD_CONFIG_URI=http://config-server:8012
+#    depends_on:
+#      - config-server
+#      - discovery-service
+#      - kafka
+#    networks:
+#      - bookstore-network
 
-  # Модуль email-sender
-  email-sender:
-    build:
-      context: .
-      dockerfile: email-sender/Dockerfile
-    ports:
-      - "8081:8081"
-    depends_on:
-      - postgres
-      - kafka
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bookStore
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: spring
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-
-# Тома для данных PostgreSQL
 volumes:
   postgres_data:
+  es_data:
+
+networks:
+  bookstore-network:
+    driver: bridge
