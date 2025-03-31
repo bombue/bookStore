@@ -8,9 +8,6 @@ WORKDIR /app
 COPY build.gradle .
 COPY settings.gradle .
 COPY /src ./src
-#COPY configurationServer/build.gradle ./configurationServer/
-#COPY configurationServer/settings.gradle ./configurationServer/
-#COPY configurationServer/src ./configurationServer/src
 
 # Собираем приложение
 RUN gradle :bootJar -x test
